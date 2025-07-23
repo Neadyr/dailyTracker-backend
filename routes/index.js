@@ -79,7 +79,7 @@ router.get("/initDay", async (req, res) => {
     res.json({
       result: true,
       message: "Day already initialized",
-      dayStreak: dayStreak + 3214,
+      dayStreak: dayStreak,
       timeSinceLastBadDay,
     });
   } else {
@@ -88,7 +88,7 @@ router.get("/initDay", async (req, res) => {
     res.json({
       result: true,
       message: "Day properly initialised",
-      dayStreak: dayStreak + 4132,
+      dayStreak: dayStreak,
       timeSinceLastBadDay,
     });
   }
