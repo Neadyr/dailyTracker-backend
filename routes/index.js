@@ -79,7 +79,7 @@ router.get("/initDay", async (req, res) => {
     res.json({
       result: true,
       message: "Day already initialized",
-      dayStreak: dayStreak,
+      dayStreak,
       timeSinceLastBadDay,
     });
   } else {
@@ -88,12 +88,44 @@ router.get("/initDay", async (req, res) => {
     res.json({
       result: true,
       message: "Day properly initialised",
-      dayStreak: dayStreak,
+      dayStreak,
       timeSinceLastBadDay,
     });
   }
 });
 
+router.get("/lastGift", async (req, res) => {
+  let keepGoing = true;
+  let i = 0;
+  let timeSinceLastGift = 0;
+  const pattern = new RegExp(/gift/i);
+
+  while (keepGoing) {
+    const loopIndexStartDate = moment().add(i, "d").format("YYYY MM DD");
+    const loopIndexEndDate = moment()
+      .add(i + 1, "d")
+      .format("YYYY MM DD");
+
+    const currentLoopDay = await Day.findOne({
+      date: {
+        $gte: new Date(loopIndexStartDate),
+        $lte: new Date(loopIndexEndDate),
+      },
+    });
+    if (!currentLoopDay) {
+      keepGoing = false;
+      break;
+    }
+
+    if (currentLoopDay.extras.some((e) => pattern.test(e.extraDesc))) {
+      keepGoing = false;
+    } else {
+      i--;
+      timeSinceLastGift++;
+    }
+  }
+  res.json({ result: true, timeSinceLastGift });
+});
 router.get("/checkToday", async (req, res) => {
   const todayStart = moment().format("YYYY MM DD");
   const todayEnd = moment().add(1, "d").format("YYYY MM DD");
